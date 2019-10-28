@@ -9,9 +9,11 @@ import java.io.*;
 public class CrearPersonaXml {
     public static void main(String argv[]) throws IOException{
         File fichero = new File("FichData.dat");
+        Persona persona;
 
         FileInputStream filein = new FileInputStream(fichero);
-        DataInputStream dataIS = new DataInputStream(filein);
+        //DataInputStream dataIS = new DataInputStream(filein);
+        ObjectInputStream objectInputStream = new ObjectInputStream(filein);
 
         int  edad, posicion=0; //para situarnos al principio del fichero
         String nombre;
@@ -20,12 +22,13 @@ public class CrearPersonaXml {
         try{
             DocumentBuilder builder = factory.newDocumentBuilder();
             DOMImplementation implementation = builder.getDOMImplementation();
-            Document document = implementation.createDocument(null, "Persona", null);
+            Document document = implementation.createDocument(null, "Personas", null);
             document.setXmlVersion("1.0"); // asignamos la version de nuestro XML
 
-            while (dataIS.available()>0) {
-                nombre = dataIS.readUTF(); // obtengo id de empleado
-                edad = dataIS.readInt();
+            while (filein.available()>0) {
+                persona = (Persona) objectInputStream.readObject();
+                nombre = persona.getNombre(); // obtengo id de empleado
+                edad = persona.getEdad();
 
                 Element raiz = document.createElement("persona"); //nodo empleado
                 document.getDocumentElement().appendChild(raiz);
@@ -46,7 +49,8 @@ public class CrearPersonaXml {
 
 
         }catch(Exception e){System.err.println("Error: "+e);}
-        dataIS.close();  //cerrar fichero
+        //dataIS.close();  //cerrar fichero
+        objectInputStream.close();
     }//de main
 
     //Inserci�n de los datos del empleado
